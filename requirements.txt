@@ -1,0 +1,4 @@
+openai==0.27.8
+python-dotenv==1.0.0
+streamlit==1.28.1
+lida==0.0.10

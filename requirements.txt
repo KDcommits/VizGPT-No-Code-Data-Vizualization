@@ -1,4 +1,8 @@
 openai==0.27.8
+pandas==2.1.2
+plotly==5.18.0
 python-dotenv==1.0.0
+matplotlib==3.8.1
 streamlit==1.28.1
 lida==0.0.10
+numpy==1.26.1

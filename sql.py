@@ -117,12 +117,15 @@ class SQLQuery:
             # results = str(cursor.fetchall())
             # print(results)
             results  = pd.read_sql_query(query, conn)
-            results.to_csv('filename.csv')
-            print(results)
-            conn.close()
+            results.to_csv('filename.csv', index=False)
+            if results.shape[0]<=100:
+                conn.close()
+                return str(results.values)
+            else:
+                return str(results.head(20).values)
         except Exception as e:
             results = f"query failed with error: {e}"
-        return str(results.values)
+        
     
     def execute_function_call(self,message):
         if message["function_call"]["name"] == "ask_database":
@@ -132,7 +135,7 @@ class SQLQuery:
             results = f"Error: function {message['function_call']['name']} does not exist"
         return results
     
-    def openai_functions_chain(self,query, 
+    def openai_functions_chain(self,query, function_calls,
                                gpt_model_name="gpt-3.5-turbo-0613"):
         messages = []
         messages.append({"role": "system", "content": "Answer user questions by generating SQL queries against the CanonDB Database."})
@@ -149,12 +152,13 @@ class SQLQuery:
 
             if assistant_message.get("function_call"):
                 print("Executing function: ", assistant_message["function_call"])
+                function_calls.append(assistant_message["function_call"])
                 results = self.execute_function_call(assistant_message)
                 messages.append({"role": "function", "name": assistant_message["function_call"]["name"], "content": results})
             else:
                 break
 
-        return assistant_message['content']
+        return assistant_message['content'],function_calls
         
 
 # question = "find the product names"
